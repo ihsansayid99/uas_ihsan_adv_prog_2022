@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uas_ihsansayidmuharrom_d111811012_if7c/auth_service.dart';
@@ -10,6 +11,7 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    FirebaseAuth _auth = FirebaseAuth.instance;
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: Background(
@@ -53,8 +55,18 @@ class LoginScreen extends StatelessWidget {
               margin: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
               child: RaisedButton(
                 onPressed: () async {
-                  await AuthServices.signIn(
-                      emailController.text, passwordController.text);
+                  try {
+                    UserCredential result =
+                        await _auth.signInWithEmailAndPassword(
+                            email: emailController.text,
+                            password: passwordController.text);
+                    User user = result.user;
+                    return user;
+                  } on FirebaseAuthException catch (e) {
+                    tampil(e.message);
+                  }
+                  // await AuthServices.signIn(
+                  //     emailController.text, passwordController.text);
                 },
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(80.0)),
@@ -102,11 +114,11 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  void tampil() {
+  void tampil(msg) {
     Fluttertoast.showToast(
-        msg: "Username atau Password salah",
+        msg: msg,
         toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP_RIGHT,
+        gravity: ToastGravity.TOP,
         timeInSecForIosWeb: 1,
         backgroundColor: Colors.blue[700],
         textColor: Colors.white,

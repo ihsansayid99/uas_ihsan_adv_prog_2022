@@ -1,7 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:uas_ihsansayidmuharrom_d111811012_if7c/auth_service.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uas_ihsansayidmuharrom_d111811012_if7c/background.dart';
 import 'package:uas_ihsansayidmuharrom_d111811012_if7c/login.dart';
 
@@ -12,9 +11,8 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    CollectionReference users = firestore.collection('users');
     Size size = MediaQuery.of(context).size;
+    FirebaseAuth _auth = FirebaseAuth.instance;
     return Scaffold(
       body: Background(
         child: Column(
@@ -57,6 +55,17 @@ class RegisterScreen extends StatelessWidget {
               margin: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
               child: RaisedButton(
                 onPressed: () async {
+                  try {
+                    await _auth.createUserWithEmailAndPassword(
+                        email: emailController.text,
+                        password: passwordController.text);
+
+                    //Success
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()));
+                  } on FirebaseAuthException catch (e) {
+                    tampil(e.message);
+                  }
                   //ADD DATA
                   // users.add({
                   //   'divisi': divisiController.text,
@@ -67,8 +76,8 @@ class RegisterScreen extends StatelessWidget {
                   // usernameController.text = '';
                   // passwordController.text = '';
 
-                  await AuthServices.signUp(
-                      emailController.text, passwordController.text);
+                  // await AuthServices.signUp(
+                  //     emailController.text, passwordController.text);
                 },
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(80.0)),
@@ -114,5 +123,16 @@ class RegisterScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void tampil(msg) {
+    Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.blue[700],
+        textColor: Colors.white,
+        fontSize: 16.0);
   }
 }

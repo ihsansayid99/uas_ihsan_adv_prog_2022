@@ -16,6 +16,9 @@ class MyApp extends StatelessWidget {
     return StreamProvider.value(
       value: AuthServices.firebaseUserStream,
       child: MaterialApp(
+        theme: ThemeData(
+          brightness: Brightness.light,
+        ),
         debugShowCheckedModeBanner: false,
         home: Wrapper(),
       ),
